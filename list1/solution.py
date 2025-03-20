@@ -28,7 +28,7 @@ class PublicTransportGraph:
         return list(start_stops.union(end_stops))
 
     def build_connections(self):
-        """Build graph of connections between bus stops"""
+        """Builds graph of connections between bus stops"""
         connections = {}
 
         for _, row in self.df.iterrows():
@@ -59,13 +59,14 @@ class PublicTransportGraph:
 
         return connections
 
-    def get_available_connection(self, start, end, current_time_minutes):
-        """Returns closest (by time) connection"""
+    def get_best_connection(self, start, end, current_time_minutes):
+        """Returns the best connection in terms of travel time + waiting time between two stops"""
         if start not in self.stops or end not in self.connections[start]:
-            return None, float("inf")
+            return None, float("inf"), float("inf")
 
         connections = self.connections[start][end]
-        next_connection = None
+        best_connection = None
+        min_total_time = float("inf")
         min_wait_time = float("inf")
 
         for conn in connections:
@@ -76,12 +77,14 @@ class PublicTransportGraph:
                 dep_time += 1440
 
             wait_time = dep_time - current_time_minutes
+            total_time = wait_time + conn["travel_time"]
 
-            if wait_time < min_wait_time:
+            if total_time < min_total_time:
+                min_total_time = total_time
                 min_wait_time = wait_time
-                next_connection = conn
+                best_connection = conn
 
-        return next_connection, min_wait_time
+        return best_connection, min_total_time, min_wait_time
 
     def dijkstra(self, start_stop, end_stop, start_time):
         """Implemented Dijkstra algorithm to finds the best connection (by time) between two stops"""
@@ -106,10 +109,10 @@ class PublicTransportGraph:
             for next_stop in self.connections[current_stop]:
                 if next_stop in visited:
                     continue
-                next_conn, wait_time = self.get_available_connection(current_stop, next_stop, current_time)
+                next_conn, total_time, wait_time = self.get_best_connection(current_stop, next_stop, current_time)
                 if next_conn is None:
                     continue
-                total_time = wait_time + next_conn["travel_time"]
+                # total_time = wait_time + next_conn["travel_time"]
 
                 if current_distance + total_time < distances[next_stop]:
                     # print(f"current time: {current_distance}")
