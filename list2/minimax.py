@@ -1,4 +1,4 @@
-import time, copy
+import time, copy, random
 from typing import Tuple, Optional
 from heuristics import *
 

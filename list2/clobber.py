@@ -74,6 +74,26 @@ class ClobberGame:
                                 valid_moves.append(((r, c), (new_r, new_c)))
         return valid_moves
 
+    def get_valid_moves_from(self, position: tuple[int, int], player: str) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+        """
+        Returns the list of moves of player `player` only from position `position` if the piece in that position belongs
+        to the player. The move is: ((z_x, z_y), (to_x, to_y))
+        """
+        x, y = position
+        if self.board[x, y] != player:
+            return []
+
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        valid_moves = []
+
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < self.rows and 0 <= ny < self.cols:
+                if self.board[nx, ny] != '.' and self.board[nx, ny] != player:
+                    valid_moves.append(((x, y), (nx, ny)))
+
+        return valid_moves
+
     def make_move(self, move: Tuple[Tuple[int, int], Tuple[int, int]]):
         """
         Makes move on board
