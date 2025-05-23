@@ -1,53 +1,81 @@
 (define (problem logistics-problem)
     (:domain logistics)
+    
     (:objects
-        magazyn-wwa centrala-wwa lotnisko-wwa - location
-        magazyn-krk centrala-krk lotnisko-krk - location
-    
-        warszawa krakow - city
-    
-        ciezarowka1 ciezarowka2 samolot - vehicle
-    
-        paczka1 paczka2 paczka3 - package
+        city1 city2 city3 city4 hub1 port1 port2 - location
+        truck1 truck2 - truck
+        plane1 plane2 - plane
+        ship1 - ship
+        pkg1 pkg2 pkg3 - package
     )
-  
-    (:init
 
-        (in-city magazyn-wwa warszawa)
-        (in-city centrala-wwa warszawa)
-        (in-city lotnisko-wwa warszawa)
-        
-        (in-city magazyn-krk krakow)
-        (in-city centrala-krk krakow)
-        (in-city lotnisko-krk krakow)
-        
-        (connected magazyn-wwa centrala-wwa)
-        (connected centrala-wwa magazyn-wwa)
-        (connected centrala-wwa lotnisko-wwa)
-        (connected lotnisko-wwa centrala-wwa)
-        
-        (connected magazyn-krk centrala-krk)
-        (connected centrala-krk magazyn-krk)
-        (connected centrala-krk lotnisko-krk)
-        (connected lotnisko-krk centrala-krk)
-        
-        (connected lotnisko-wwa lotnisko-krk)
-        (connected lotnisko-krk lotnisko-wwa)
-    
-        (at-vehicle ciezarowka1 magazyn-wwa)
-        (at-vehicle ciezarowka2 magazyn-krk)
-        (at-vehicle samolot lotnisko-wwa)
-    
-        (at paczka1 magazyn-wwa)
-        (at paczka2 magazyn-wwa)
-        (at paczka3 centrala-wwa)
+    (:init
+        (at truck1 city1)
+        (at truck2 city3)
+        (at plane1 city1)
+        (at plane2 hub1)
+        (at ship1 port1)
+
+        (at-pkg pkg1 city1)
+        (at-pkg pkg2 port1)
+        (at-pkg pkg3 city3)
+
+        (road-connection city1 city2)
+        (road-connection city2 city1)
+        (road-connection city2 city3)
+        (road-connection city3 city2)
+        (road-connection city1 city4)
+        (road-connection city4 city1)
+        (road-connection city4 city3)
+        (road-connection city3 city4)
+        (road-connection city3 city1)
+        (road-connection city1 city3) 
+
+        (air-connection city1 hub1)
+        (air-connection hub1 city1)
+        (air-connection hub1 city3)
+        (air-connection city3 hub1)
+        (air-connection city1 city3)
+        (air-connection city3 city1)
+
+        (water-connection port1 port2)
+        (water-connection port2 port1)
+        (water-connection city2 port2)
+        (water-connection port2 city2)
+
+        (= (road-cost city1 city2) 3)
+        (= (road-cost city2 city1) 3)
+        (= (road-cost city2 city3) 2)
+        (= (road-cost city3 city2) 2)
+        (= (road-cost city1 city4) 1)
+        (= (road-cost city4 city1) 2)
+        (= (road-cost city3 city4) 1)
+        (= (road-cost city4 city3) 1)
+        (= (road-cost city3 city1) 8)
+        (= (road-cost city1 city3) 8)
+
+        (= (air-cost city1 hub1) 4)
+        (= (air-cost hub1 city1) 5)
+        (= (air-cost hub1 city3) 4)
+        (= (air-cost city3 hub1) 4)
+        (= (air-cost city1 city3) 10)
+        (= (air-cost city3 city1) 10)
+
+        (= (water-cost port1 port2) 6)
+        (= (water-cost port2 port1) 6)
+        (= (water-cost city2 port2) 2)
+        (= (water-cost port2 city2) 3)
+
+        (= (total-cost) 0)
     )
-  
+
     (:goal
         (and
-            (at paczka1 centrala-krk)
-            (at paczka2 magazyn-krk)
-            (at paczka3 lotnisko-krk)
+        (at-pkg pkg1 city3)
+        (at-pkg pkg2 port2)
+        (at-pkg pkg3 city1)
         )
     )
+
+    (:metric minimize (total-cost))
 )
